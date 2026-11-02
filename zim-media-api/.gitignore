@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/
+*.db
+dev_api_key
+.mypy_cache/
+htmlcov/
+.coverage

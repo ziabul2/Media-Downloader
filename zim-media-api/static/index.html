@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ZIM Media API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%2314120e' width='32' height='32'/%3E%3Crect x='6' y='8' width='20' height='3' fill='%23e6a23c'/%3E%3Crect x='6' y='15' width='14' height='3' fill='%23f3efe4'/%3E%3Crect x='6' y='22' width='10' height='3' fill='%23b7b0a2'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div class="sheet">
+      <header class="top">
+        <div class="brand">
+          <span class="mark" aria-hidden="true"></span>
+          <div>
+            <p class="word">ZIM</p>
+            <p class="sub">Media API</p>
+          </div>
+        </div>
+        <div class="pills" id="pills">
+          <span class="pill" id="health-pill">Checking</span>
+          <span class="pill" id="proxy-pill">Proxy</span>
+          <a class="pill link" href="/docs">OpenAPI</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="kicker">Extraction desk</p>
+        <h1>The file stays where it is.</h1>
+        <p class="lede">
+          ZIM reads a public media page, names the real formats, and gives your device a short-lived route to the original host. Nothing is kept as a library.
+        </p>
+      </section>
+
+      <section class="grid">
+        <form class="panel" id="extract-form">
+          <div class="panel-head">
+            <h2>Source</h2>
+            <button class="text-btn" type="button" id="use-sample">Use a CC sample</button>
+          </div>
+          <label for="url">Media URL</label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            required
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="https://archive.org/details/BigBuckBunny_124"
+          />
+          <div class="fields">
+            <label>
+              Kind
+              <select id="media-type" name="media_type">
+                <option value="video">Video</option>
+                <option value="audio">Audio</option>
+              </select>
+            </label>
+            <label>
+              Format
+              <select id="preferred-format" name="preferred_format">
+                <option value="mp4">MP4</option>
+                <option value="m4a">M4A</option>
+                <option value="mp3">MP3</option>
+                <option value="original">Original</option>
+              </select>
+            </label>
+            <label>
+              Quality
+              <select id="preferred-quality" name="preferred_quality">
+                <option value="2160p">2160p</option>
+                <option value="1440p">1440p</option>
+                <option value="1080p" selected>1080p</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+                <option value="360p">360p</option>
+                <option value="best">Best</option>
+              </select>
+            </label>
+          </div>
+          <div class="key-row">
+            <label for="api-key">API key</label>
+            <input id="api-key" type="password" autocomplete="off" spellcheck="false" />
+          </div>
+          <button class="primary" id="extract-btn" type="submit">Extract formats</button>
+          <p class="hint" id="form-hint">Development attaches a local owner key. It is not a production credential.</p>
+        </form>
+
+        <aside class="panel quiet">
+          <h2>Delivery order</h2>
+          <ol class="steps">
+            <li><strong>Direct</strong><span>The source URL, only after the file, codecs, and headers are checked.</span></li>
+            <li><strong>Redirect</strong><span>A ZIM ticket that answers 302 and stores nothing.</span></li>
+            <li><strong>Proxy</strong><span>Off until it is explicitly enabled. Not a way around locks.</span></li>
+          </ol>
+          <p class="platforms" id="platforms">Loading platforms…</p>
+        </aside>
+      </section>
+
+      <section class="panel result" id="result" hidden>
+        <div class="result-top">
+          <img id="thumb" alt="" hidden />
+          <div>
+            <p class="kicker" id="platform">Platform</p>
+            <h2 id="title">Title</h2>
+            <p class="meta" id="meta"></p>
+          </div>
+        </div>
+        <p class="note" id="selection-note" hidden></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Quality</th>
+                <th>File</th>
+                <th>Video</th>
+                <th>Audio</th>
+                <th>Merge</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="formats"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel result" id="delivery" hidden>
+        <div class="panel-head">
+          <h2>Ticket</h2>
+          <span class="pill" id="delivery-mode">Direct</span>
+        </div>
+        <p id="delivery-copy"></p>
+        <p class="filename" id="filename"></p>
+        <div class="url-box" id="url-box" hidden>
+          <code id="direct-url"></code>
+          <button class="text-btn" type="button" id="copy-url">Copy</button>
+        </div>
+        <div class="actions">
+          <a class="primary as-link" id="open-download" href="#" hidden>Open download</a>
+          <button class="ghost" type="button" id="revoke">Revoke ticket</button>
+        </div>
+        <p class="hint" id="constraint"></p>
+      </section>
+
+      <section class="status-line" id="status" role="status"></section>
+
+      <section class="limits">
+        <h2>What this will not do</h2>
+        <ul>
+          <li>Bypass DRM, paywalls, private accounts, or geographic locks.</li>
+          <li>Rename M4A or WebM to MP3. Conversion is reported, not pretended.</li>
+          <li>Call a silent video a complete MP4, or merge split streams on the server.</li>
+          <li>Keep a media library. Tickets expire. The host sends the bytes.</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Reference</h2>
+        <div class="table-wrap">
+          <table class="ref">
+            <thead>
+              <tr><th>Call</th><th>What it returns</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>POST /api/v1/extract</code></td><td>Title, duration, and real formats</td></tr>
+              <tr><td><code>POST /api/v1/download-link</code></td><td>A short-lived ticket and the chosen delivery</td></tr>
+              <tr><td><code>GET /api/v1/download/{ticket}</code></td><td>302 to the source, cache disabled</td></tr>
+              <tr><td><code>GET /api/v1/stream/{ticket}</code></td><td>Proxy, only when enabled</td></tr>
+              <tr><td><code>GET /docs</code></td><td>OpenAPI for every endpoint</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        <p>Direct delivery is the default. If a signed URL is tied to a network or a header, the ticket says so.</p>
+      </footer>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
